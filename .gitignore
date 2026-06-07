@@ -1,0 +1,9 @@
+output/*.glb
+output/*.gltf
+__pycache__/
+*.egg-info/
+.venv/
+*.pyc
+.eggs/
+dist/
+build/
