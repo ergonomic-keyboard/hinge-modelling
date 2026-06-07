@@ -4,7 +4,7 @@
 
 The existing hinge mechanism models are built with Three.js primitives in `wip/mechanisms/demo/index.html` (approximate shapes) and `wip/hardware-builders.js` (more accurate but still limited to boxes, cylinders, tori). The user wants precise, CAD-quality models created with [build123d](https://github.com/gumyr/build123d) that can be exported to glTF/GLB and loaded in the browser Three.js visualization.
 
-**Why build123d?** Three.js primitives can't represent true BREP geometry — fillets, chamfers, accurate Hirth tooth profiles (varying V-groove height from bore to OD), rounded box corners, and threaded features. build123d uses the OpenCASCADE kernel for exact boundary representation and exports directly to glTF.
+**Why build123d?** While Three.js *can* represent any mesh geometry, authoring precise mechanical parts (Hirth tooth profiles with radially-varying V-groove height, filleted edges, threaded features) requires manually computing vertex positions or writing custom parametric mesh generators. build123d provides high-level CAD operations (`loft()`, `fillet()`, `revolve()`, `PolarLocations`) purpose-built for this — making it easier to produce geometrically accurate results, and easier for the LLM to work with for this specific modelling task. The output is still a triangle mesh (glTF) that Three.js renders normally.
 
 **Dimension source:** `wip/hardware-catalog.js` contains manufacturer-sourced dimensions (Reell PHA 8mm, 20mm Hirth disc with 24 teeth, Tekno TKR6250 turnbuckle, etc.). These supersede the demo's approximate values (60mm Hirth, 12 teeth).
 
