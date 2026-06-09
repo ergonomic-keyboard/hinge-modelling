@@ -13,6 +13,7 @@ from build123d import Compound, export_gltf, Unit
 from src.assembly import CONFIGS
 from src.glb_postprocess import inject_labels
 from src.verification import verify_config
+from src.mesh_collision import check_mesh_collisions
 
 
 OUTPUT_DIR = project_root / "output"
@@ -46,9 +47,9 @@ def build_config(name: str, assemble_fn, output_dir: Path = OUTPUT_DIR):
         size_kb = glb_path.stat().st_size / 1024
         print(f"    -> {glb_path} ({size_kb:.0f} KB)")
 
-        # Physical plausibility verification
+        # Analytical plausibility verification
         result = verify_config(name)
-        print(f"    Verification: fold={result.max_fold_angle:.0f}° "
+        print(f"    Analytical: fold={result.max_fold_angle:.0f}° "
               f"butterfly={result.max_butterfly_angle:.0f}°"
               f" — {'PASS' if result.passed else 'FAIL'}")
         if not result.passed:
@@ -56,6 +57,15 @@ def build_config(name: str, assemble_fn, output_dir: Path = OUTPUT_DIR):
                 print(f"    Fold collisions: {result.fold_collisions[0]}")
             if result.butterfly_collisions:
                 print(f"    Butterfly collisions: {result.butterfly_collisions[0]}")
+            return False
+
+        # Mesh-based collision detection (uses actual part geometry)
+        mesh_report = check_mesh_collisions(parts, step_deg=5.0, config_name=name)
+        print(f"    Mesh check: clear to {mesh_report.max_clear_fold_angle:.0f}°"
+              f" — {'PASS' if mesh_report.passed else 'FAIL'}")
+        if not mesh_report.passed:
+            for col in mesh_report.collisions[:2]:
+                print(f"      {col}")
             return False
     else:
         print(f"    FAILED: {glb_path}")
